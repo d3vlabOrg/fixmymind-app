@@ -18,6 +18,17 @@ export const SupabaseAuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Helper function to validate user uid
+  const validateUserAccess = async (data) => {
+    const allowedUid = "1785dd9e-38b3-4fce-a2eb-8f468b1dac2b";
+    if (data.user && data.user.id !== allowedUid) {
+      // Sign out the user immediately
+      await supabaseLogout();
+      throw new Error("under development, please check later");
+    }
+    return data;
+  };
+
   // Initialize auth state
   useEffect(() => {
     // Get the current user when the component mounts
@@ -57,8 +68,9 @@ export const SupabaseAuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const data = await loginWithEmailPassword(email, password);
-      setUser(data.user);
-      return data;
+      const validatedData = await validateUserAccess(data);
+      setUser(validatedData.user);
+      return validatedData;
     } catch (error) {
       console.error('Error logging in:', error);
       throw error;
@@ -72,8 +84,9 @@ export const SupabaseAuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const data = await signUp(email, password);
-      setUser(data.user);
-      return data;
+      const validatedData = await validateUserAccess(data);
+      setUser(validatedData.user);
+      return validatedData;
     } catch (error) {
       console.error('Error registering:', error);
       throw error;
@@ -87,7 +100,8 @@ export const SupabaseAuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const data = await loginWithGoogle();
-      return data;
+      const validatedData = await validateUserAccess(data);
+      return validatedData;
     } catch (error) {
       console.error('Error logging in with Google:', error);
       throw error;
@@ -101,7 +115,8 @@ export const SupabaseAuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const data = await loginWithPhone(phone);
-      return data;
+      const validatedData = await validateUserAccess(data);
+      return validatedData;
     } catch (error) {
       console.error('Error logging in with phone:', error);
       throw error;
