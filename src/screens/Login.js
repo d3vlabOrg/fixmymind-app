@@ -19,7 +19,7 @@ const LoginScreen = () => {
     const handleLogin = async () => {
         try {
             const data = await login(email, password);
-            if (data) {
+            if (data && navigation) {
                 navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
             }
         } catch (error) {
@@ -30,7 +30,7 @@ const LoginScreen = () => {
     const handleGoogleLogin = async () => {
         try {
             const data = await loginWithGoogle();
-            if (data) {
+            if (data && navigation) {
                 navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
             }
         } catch (error) {

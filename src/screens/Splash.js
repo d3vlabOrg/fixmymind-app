@@ -11,14 +11,16 @@ const SplashScreen = () => {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (user) {
-                navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
-            } else {
-                navigation.reset({ index: 0, routes: [{ name: 'Welcome' }] });
+            if (navigation) {
+                if (user) {
+                    navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+                } else {
+                    navigation.reset({ index: 0, routes: [{ name: 'Welcome' }] });
+                }
             }
         }, 2000);
         return () => clearTimeout(timer);
-    }, [user]);
+    }, [user, navigation]);
 
     return (
         <AuthLayout>

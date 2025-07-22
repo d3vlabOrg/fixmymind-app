@@ -26,6 +26,29 @@ const loginWithEmailPassword = async (email, password) => {
 };
 
 /**
+ * Get environment-aware redirect URL
+ * @returns {string} - The appropriate redirect URL based on environment
+ */
+const getRedirectUrl = () => {
+  // Check if we're in development environment
+  const isDev = __DEV__ || process.env.NODE_ENV === 'development';
+  
+  // For web environments, check the current hostname
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname.includes('dev.fixmymind.org')) {
+      return 'https://dev.fixmymind.org/redirect';
+    }
+    if (hostname.includes('fixmymind.org')) {
+      return 'https://fixmymind.org/redirect';
+    }
+  }
+  
+  // Default based on development flag
+  return isDev ? 'https://dev.fixmymind.org/redirect' : 'https://fixmymind.org/redirect';
+};
+
+/**
  * Login with Google OAuth
  * @returns {Promise} - Supabase auth response
  */
@@ -33,6 +56,9 @@ const loginWithGoogle = async () => {
   try {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
+      options: {
+        redirectTo: getRedirectUrl(),
+      },
     });
 
     if (error) throw error;
@@ -51,6 +77,9 @@ const signUpWithGoogle = async () => {
   try {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
+      options: {
+        redirectTo: getRedirectUrl(),
+      },
     });
 
     if (error) throw error;
@@ -69,6 +98,9 @@ const loginWithFacebook = async () => {
   try {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'facebook',
+      options: {
+        redirectTo: getRedirectUrl(),
+      },
     });
 
     if (error) throw error;
@@ -87,6 +119,9 @@ const signUpWithFacebook = async () => {
   try {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'facebook',
+      options: {
+        redirectTo: getRedirectUrl(),
+      },
     });
 
     if (error) throw error;

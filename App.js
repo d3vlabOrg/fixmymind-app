@@ -23,13 +23,36 @@ import CheckoutSuccess from "./src/screens/CheckoutSucess";
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
+    // Environment-aware linking prefixes
+    const getLinkingPrefixes = () => {
+        const isDev = __DEV__ || process.env.NODE_ENV === 'development';
+        
+        // For web environments, check the current hostname
+        if (typeof window !== 'undefined') {
+            const hostname = window.location.hostname;
+            if (hostname.includes('dev.fixmymind.org')) {
+                return ['https://dev.fixmymind.org'];
+            }
+            if (hostname.includes('fixmymind.org')) {
+                return ['https://fixmymind.org'];
+            }
+        }
+        
+        // Default based on development flag
+        return isDev ? ['https://dev.fixmymind.org'] : ['https://fixmymind.org'];
+    };
+
     return (
         <NavigationContainer
-            linking={{prefixes: ['https://dev.fixmymind.org'],config: {
-                screens: {
+            linking={{
+                prefixes: getLinkingPrefixes(),
+                config: {
+                    screens: {
                         GoogleRedirect: 'redirect',
                         // dodaj inne jeśli chcesz wspierać bezpośrednie linki
-                    },},}}>
+                    },
+                },
+            }}>
             <Stack.Navigator
                 screenOptions={{ headerShown: false }}
                 initialRouteName="Splash"

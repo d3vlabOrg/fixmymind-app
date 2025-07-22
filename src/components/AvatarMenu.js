@@ -15,7 +15,9 @@ export default function AvatarMenu() {
     const handleLogout = async () => {
         setModalVisible(false);
         await logout();
-        navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+        if (navigation) {
+            navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+        }
     };
 
     const handleNavigate = (screen) => {

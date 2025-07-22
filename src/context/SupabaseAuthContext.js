@@ -36,9 +36,21 @@ export const SupabaseAuthProvider = ({ children }) => {
       try {
         setLoading(true);
         const currentUser = await getUser();
-        setUser(currentUser);
+        if (currentUser) {
+          // Validate user access for existing sessions
+          try {
+            await validateUserAccess({ user: currentUser });
+            setUser(currentUser);
+          } catch (error) {
+            console.error('User access validation failed during initialization:', error);
+            setUser(null);
+          }
+        } else {
+          setUser(null);
+        }
       } catch (error) {
         console.error('Error initializing auth:', error);
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -47,13 +59,25 @@ export const SupabaseAuthProvider = ({ children }) => {
     initializeAuth();
 
     // Subscribe to auth state changes
-    const unsubscribe = onAuthStateChange((event, session) => {
+    const unsubscribe = onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
-        setUser(session.user);
+        try {
+          await validateUserAccess({ user: session.user });
+          setUser(session.user);
+        } catch (error) {
+          console.error('User access validation failed during sign in:', error);
+          setUser(null);
+        }
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
       } else if (event === 'USER_UPDATED' && session?.user) {
-        setUser(session.user);
+        try {
+          await validateUserAccess({ user: session.user });
+          setUser(session.user);
+        } catch (error) {
+          console.error('User access validation failed during user update:', error);
+          setUser(null);
+        }
       }
     });
 
